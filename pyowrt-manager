@@ -1,0 +1,63 @@
+#!/bin/bash
+pid_command=$(ps | grep 'python /etc/pyowrt/main.py' | grep -v grep | awk '{print $1}')
+
+
+start_service() {
+    if [ -n "$pid_command" ]; then
+        echo "pyowrt Sudah Berjalan. PID : $pid_command"
+    else
+        echo "Menjalankan pyowrt."
+        python /etc/pyowrt/main.py > /dev/null 2>&1 &
+        echo "Berhasil Menjalankan pyowrt."
+    fi
+}
+stop_service() {
+    if [ -n "$pid_command" ]; then
+        kill "$pid_command"
+    else
+        echo "pyowrt tidak berjalan."
+    fi
+}
+reload_service(){
+    if [ -n "$pid_command" ]; then
+        echo "menstop pyowrt."
+        kill "$pid_command"
+        python /etc/pyowrt/main.py > /dev/null 2>&1 &
+        echo "Berhasil Mereload Menjalankan pyowrt."
+    else
+        echo "pyowrt tidak berjalan."
+        python /etc/pyowrt/main.py > /dev/null 2>&1 &
+        echo "Berhasil Menjalankan Kembali pyowrt."
+    fi
+}
+autorun_service(){
+    if [ -n "$pid_command" ]; then
+        echo "pyowrt Sudah Berjalan. PID : $pid_command"
+    else
+        echo "Menjalankan pyowrt."
+        python /etc/pyowrt/main.py > /dev/null 2>&1 &
+        echo "Berhasil Menjalankan pyowrt."
+    fi
+}
+
+# Memeriksa argumen yang diberikan
+case "$1" in
+    "start")
+        start_service
+        ;;
+    "stop")
+        stop_service
+        ;;
+    "reload")
+        reload_service
+        ;;
+    "autorun")
+        autorun_service
+        ;;
+    *)
+        echo "Pilihan yang tersedia: start, stop, reload, autorun"
+        exit 1
+        ;;
+esac
+
+exit 0
